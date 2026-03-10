@@ -50,7 +50,7 @@ function recalculateShelfGrid(container) {
 
 // 測試用 API
 const API_URL =
-  "http://127.0.0.1:3658/m1/1222159-1218189-default/api/libraryBook/getBookList";
+  "https://mock.apidog.com/m1/1222159-1218189-default/api/libraryBook/getBookList";
 
 // ── 元素引用 ───────────────────────────────────────────
 
