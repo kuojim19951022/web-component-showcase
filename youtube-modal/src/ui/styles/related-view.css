@@ -1,0 +1,116 @@
+.related-view-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.related-title {
+  font-size: 18px;
+  color: #2d2d2d;
+  margin: 0;
+  padding: 0;
+}
+
+.video-modal-related-videos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+@media (max-width: 768px) {
+  .video-modal-related-videos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.related-video-item {
+  cursor: pointer;
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.related-video-item:hover {
+  transform: translateY(-3px);
+}
+
+.related-video-cover {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #d6d6d6;
+  border: 1px solid #d6d6d6;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.related-video-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter 0.3s ease;
+}
+
+.related-video-cover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0);
+  transition: background 0.3s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.related-video-play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 2;
+  pointer-events: none;
+  width: 51px;
+  height: 36px;
+  background: #ff0000;
+  border-radius: 10.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.related-video-play-icon .play-icon-triangle {
+  width: 0;
+  height: 0;
+  border-left: 15px solid #fff;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  margin-left: 3px;
+}
+
+.related-video-item:hover .related-video-cover::before {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.related-video-item:hover .related-video-play-icon {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.related-video-title {
+  font-size: 13px;
+  text-align: center;
+  color: #333;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}

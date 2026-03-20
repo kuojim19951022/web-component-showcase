@@ -1,4 +1,3 @@
-// HTML 轉義（防止 XSS）
 export function escapeHtml(text) {
   if (!text) return "";
   const map = {
@@ -11,7 +10,6 @@ export function escapeHtml(text) {
   return String(text).replace(/[&<>"']/g, (m) => map[m]);
 }
 
-// 解析 HTML 布林屬性（如 show-related）
 export function getBooleanAttribute(element, name, fallback) {
   if (!element.hasAttribute(name)) return fallback;
   const value = element.getAttribute(name);
@@ -19,14 +17,6 @@ export function getBooleanAttribute(element, name, fallback) {
   return !/^(false|0|no|off)$/i.test(value.trim());
 }
 
-// 取得播放器類型（屬性優先，否則 config 預設值）
-export function getPlayerType(element, validTypes, configDefault) {
-  const attrValue = element.getAttribute("player-type");
-  if (attrValue && validTypes.includes(attrValue)) return attrValue;
-  return configDefault || "lite-youtube";
-}
-
-// 清空 modal 標題、描述、播放器、相關影片區塊
 export function clearModalContent(elements) {
   const {
     title,
@@ -34,6 +24,7 @@ export function clearModalContent(elements) {
     iframeContainer,
     relatedContainer,
     relatedSection,
+    relatedViewSlot,
   } = elements;
   if (title) {
     title.textContent = "";
@@ -46,4 +37,17 @@ export function clearModalContent(elements) {
   if (iframeContainer) iframeContainer.innerHTML = "";
   if (relatedContainer) relatedContainer.innerHTML = "";
   if (relatedSection) relatedSection.style.display = "none";
+  if (relatedViewSlot) relatedViewSlot.style.display = "none";
+}
+
+export function validateVideoData(data) {
+  if (!data || typeof data !== "object") {
+    throw new Error("資料格式無效：必須為物件");
+  }
+  if (!data.video || typeof data.video !== "object") {
+    throw new Error("資料格式無效：缺少 video 欄位");
+  }
+  if (!data.video.youtubeId) {
+    throw new Error("此影片沒有 YouTube 連結");
+  }
 }

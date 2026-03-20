@@ -1,5 +1,13 @@
-const API_LIST_URL =
-  "https://mock.apidog.com/m1/1222159-1218189-default/api/libraryVideo/getVideoList";
+// 影片列表
+const VIDEO_LIST_URL = "../data/video-list.json";
+
+// 靜態 列表資料
+// ../data/video-list.json
+// API 列表資料
+// https://mock.apidog.com/m1/1222159-1218189-default/api/libraryVideo/getVideoList
+
+const VIDEO_DETAIL_API_ENDPOINT =
+  "https://mock.apidog.com/m1/1222159-1218189-default/api/libraryVideo/getVideoDetail";
 
 async function loadVideoList() {
   const container = document.getElementById("video-list-container");
@@ -11,16 +19,16 @@ async function loadVideoList() {
   }
 
   try {
-    const response = await fetch(API_LIST_URL);
+    const response = await fetch(VIDEO_LIST_URL);
     if (!response.ok) throw new Error("無法載入影片列表");
 
-    const result = await response.json();
-    if (!result.status || !result.list || result.list.length === 0) {
+    const data = await response.json();
+    // API 格式：{ status, list }；靜態 JSON 可能直接是陣列
+    const list = Array.isArray(data) ? data : (data?.list ?? []);
+    if (!list.length) {
       container.innerHTML = '<p class="no-data">暫無影音資料</p>';
       return;
     }
-
-    const list = result.list;
 
     const ytThumb = (v) =>
       v.youtubeId
@@ -35,7 +43,6 @@ async function loadVideoList() {
     container.innerHTML = template({ videos });
 
     bindVideoItemClicks(container);
-    console.log(`成功載入 ${list.length} 筆影片`);
   } catch (error) {
     console.error("載入影片列表時發生錯誤:", error);
     container.innerHTML =
@@ -51,8 +58,8 @@ function bindVideoItemClicks(container) {
     const id = item.dataset.id;
     if (!id) return;
     const modal = document.querySelector("youtube-modal");
-    if (modal && typeof modal.openWithAPI === "function") {
-      modal.openWithAPI(id);
+    if (modal && typeof modal.open === "function") {
+      modal.open(id);
     }
   });
 }
