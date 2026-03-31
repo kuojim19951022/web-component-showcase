@@ -21,7 +21,7 @@
         </p>
       </div>
 
-      <div class="bookshelf-top-item" aria-hidden="true"></div>
+      <div class="bookshelf-top-item is-loading" aria-hidden="true"></div>
       <div class="book-grid-container">
         <!-- 書本項目 -->
       </div>
@@ -36,6 +36,16 @@
           載入更多 <i class="fa-solid fa-arrows-rotate"></i>
         </a>
       </div>
+
+      <button
+        id="totop-btn"
+        class="base-button-purple totop-btn is-hidden"
+        type="button"
+        aria-label="回到頁面頂端"
+        title="回到頂端"
+      >
+        <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+      </button>
     </div>
 
     <!-- Handlebars 模板 -->
@@ -46,15 +56,60 @@
               <h3 class="book-item-title">{{title}}</h3>
           </div>
           <div class="book-item-cover{{#unless coverImage}} is-default{{/unless}}">
-              <img src="{{coverImage}}" alt="{{title}}">
+              {{#if coverImage}}
+                <img
+                  src="{{coverImage}}"
+                  alt="{{title}}"
+                  onerror="
+                    this.style.display='none';
+                    const cover=this.closest('.book-item-cover');
+                    if (cover) cover.classList.add('is-default');
+                  "
+                >
+              {{/if}}
+              <div class="book-item-cover-fallback" aria-hidden="true">
+                <i class="fa-solid fa-book"></i>
+              </div>
               <div class="book-item-overlay">
                   <div class="book-item-buttons">
-                      <a href="libraryBook?id={{id}}" target="_blank" class="book-btn" title="線上閱讀">
+                      {{#if pdfUrl}}
+                        <a
+                          href="./pdfViewer.html?id={{id}}"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="book-btn"
+                          title="線上閱讀"
+                        >
                           <i class="far fa-eye"></i>閱讀
-                      </a>
-                      <a href="/api/libraryBook/downloadBook?id={{id}}" class="book-btn book-btn-download" data-pdf-url="{{pdfUrl}}" title="下載PDF">
+                        </a>
+                      {{else}}
+                        <span
+                          class="book-btn is-disabled"
+                          aria-disabled="true"
+                          title="尚無閱讀檔案"
+                        >
+                          <i class="far fa-eye"></i>閱讀
+                        </span>
+                      {{/if}}
+                      {{#if pdfUrl}}
+                        <a
+                          href="{{pdfUrl}}"
+                          class="book-btn book-btn-download"
+                          download
+                          rel="noopener noreferrer"
+                          title="下載PDF"
+                        >
                           <i class="fa fa-download"></i>下載
-                      </a>
+                        </a>
+                      {{else}}
+                        <span
+                          class="book-btn book-btn-download is-disabled"
+                          aria-disabled="true"
+                          title="尚無下載檔案"
+                        >
+                          <i class="fa fa-download"></i>下載
+                        </span>
+                      {{/if}}
                   </div>
               </div>
           </div>

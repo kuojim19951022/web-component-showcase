@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF 閱讀器</title>
+    <link rel="stylesheet" href="../../dist/css/main.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <div id="pdf-viewer-status">載入中...</div>
+
+    <!-- pdf-url 由下方 JS 查詢 API 後帶入 -->
+    <pdf-viewer id="pdf-viewer" pdf-url=""></pdf-viewer>
+
+    <script
+      type="module"
+      src="../../components/pdf-viewer/js/pdf-viewer-component.js"
+    ></script>
+
+    <script type="module">
+      const API_URL =
+        "https://mock.apidog.com/m1/1242188-1239035-default/api/getBookList";
+
+      // 將 API 回傳的相對/裸檔名路徑，統一解析為本地靜態資源路徑
+      const BOOK_PDF_DIR = "../data/book/pdf/";
+      const resolveLocalPdfUrl = (raw) => {
+        if (!raw) return "";
+        const str = String(raw).trim();
+        if (/^https?:\/\//i.test(str)) return str;
+        const filename = str.split(/[\\/]/).pop().split("?")[0].split("#")[0];
+        return filename ? `${BOOK_PDF_DIR}${filename}` : "";
+      };
+
+      const getIdFromQuery = () =>
+        new URLSearchParams(window.location.search).get("id");
+
+      const resolvePdfUrlById = async (bookId) => {
+        const idStr = String(bookId).trim();
+        let offset = 0;
+
+        while (true) {
+          const res = await fetch(`${API_URL}?offset=${offset}`, {
+            cache: "no-store",
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+
+          const list = data?.list ?? [];
+          const hit = list.find((x) => String(x?.id) === idStr);
+          if (hit?.pdfUrl) return resolveLocalPdfUrl(hit.pdfUrl);
+
+          const totalCount = data?.totalCount ?? 0;
+          offset += list.length || 1;
+
+          if (!list.length || offset >= totalCount) break;
+        }
+
+        return "";
+      };
+
+      const run = async () => {
+        const statusEl = document.getElementById("pdf-viewer-status");
+        const viewerEl = document.getElementById("pdf-viewer");
+
+        try {
+          const id = getIdFromQuery();
+          if (!id) {
+            statusEl.textContent = "缺少 id 參數，無法載入 PDF。";
+            return;
+          }
+
+          const pdfUrl = await resolvePdfUrlById(id);
+          if (!pdfUrl) {
+            statusEl.textContent = "找不到對應的 PDF。";
+            return;
+          }
+
+          viewerEl.setAttribute(
+            "pdf-url",
+            new URL(pdfUrl, window.location.href).href,
+          );
+          statusEl.textContent = "";
+        } catch (err) {
+          console.error(err);
+          statusEl.textContent = "PDF 載入失敗，請稍後再試。";
+        }
+      };
+
+      run();
+    </script>
+  </body>
+</html>

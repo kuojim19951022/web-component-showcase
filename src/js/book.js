@@ -46,17 +46,35 @@ function recalculateShelfGrid(container) {
   updateShelfGrid(container);
 }
 
+// ── 路徑設定 ───────────────────────────────────────────
+
+const BOOK_COVER_DIR = "../images/book/";
+const BOOK_PDF_DIR = "../data/book/pdf/";
+
+// 將 API 回傳的相對/裸檔名路徑，統一解析為本地靜態資源路徑
+function resolveLocalFile(raw, baseDir) {
+  if (!raw) return "";
+  const str = String(raw).trim();
+  if (!str) return "";
+  if (/^https?:\/\//i.test(str)) return str;
+  const filename = str.split(/[\\/]/).pop().split("?")[0].split("#")[0];
+  return filename ? `${baseDir}${filename}` : "";
+}
+
 // ── API 設定 ───────────────────────────────────────────
 
 // 測試用 API
 const API_URL =
-  "https://mock.apidog.com/m1/1222159-1218189-default/api/libraryBook/getBookList";
+  "https://mock.apidog.com/m1/1242188-1239035-default/api/getBookList";
 
 // ── 元素引用 ───────────────────────────────────────────
 
 const $loadMoreBtn = document.getElementById("load-more-book");
 const $loadMoreContainer = document.querySelector(".load-more-container");
 const $bookContainer = document.querySelector(".book-grid-container");
+const $shelfTop = document.querySelector(".bookshelf-top-item");
+const $toTopBtn = document.getElementById("totop-btn");
+let shelfTopRevealed = false;
 
 // ── 抓取經書資料 ───────────────────────────────────────
 
@@ -85,12 +103,24 @@ function handleSuccess(response) {
       response.offset + response.list.length,
       response.hasMore,
     );
+    revealShelfTop();
+  } else {
+    // 無資料時仍需移除 loading，避免狀態永久保持
+    revealShelfTop();
   }
 }
 
 // 失敗處理
 function handleError(error) {
   console.error("載入書本失敗:", error);
+  revealShelfTop();
+}
+
+function revealShelfTop() {
+  if (shelfTopRevealed) return;
+  shelfTopRevealed = true;
+  if (!$shelfTop) return;
+  $shelfTop.classList.remove("is-loading");
 }
 
 // Loading 狀態
@@ -109,12 +139,23 @@ function updateLoadMoreButton(nextOffset, hasMore) {
   $loadMoreContainer.style.display = $loadMoreBtn.style.display = display;
 }
 
+function toggleToTopBtn() {
+  if (!$toTopBtn) return;
+  const shouldShow = window.scrollY > 240;
+  $toTopBtn.classList.toggle("is-hidden", !shouldShow);
+}
+
 // 渲染書本列表(Handlebars 模板引擎編譯)
 function renderBooks(list) {
   if (!$bookContainer) return;
   const templateSrc = document.getElementById("book-item-template").innerHTML;
   const templateFn = Handlebars.compile(templateSrc);
-  const html = templateFn({ books: list });
+  const books = list.map((b) => ({
+    ...b,
+    coverImage: resolveLocalFile(b.coverImage, BOOK_COVER_DIR),
+    pdfUrl: resolveLocalFile(b.pdfUrl, BOOK_PDF_DIR),
+  }));
+  const html = templateFn({ books });
   $bookContainer.insertAdjacentHTML("beforeend", html);
   recalculateShelfGrid($bookContainer);
 }
@@ -132,6 +173,8 @@ window.addEventListener("resize", () => {
 document.addEventListener("DOMContentLoaded", () => {
   // 初始載入
   fetchBooks(0);
+  toggleToTopBtn();
+
   // 載入更多
   if ($loadMoreBtn) {
     $loadMoreBtn.addEventListener("click", function () {
@@ -139,4 +182,12 @@ document.addEventListener("DOMContentLoaded", () => {
       fetchBooks(offset);
     });
   }
+
+  if ($toTopBtn) {
+    $toTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
 });
+
+window.addEventListener("scroll", toggleToTopBtn, { passive: true });

@@ -1,0 +1,25 @@
+/* =====================================================
+   pdf-viewer Web Component（Shadow DOM）樣式
+   - :host 是 <pdf-viewer> 元件本身
+   - 這裡控制元件在頁面上的尺寸與排版
+   ===================================================== */
+
+:host {
+    display: block;
+    width: 100%;
+    height: 100vh;
+}
+
+/* 元件內部容器：負責包住 iframe */
+.pdf-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* PDF.js iframe：填滿容器 */
+#pdf-viewer-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}

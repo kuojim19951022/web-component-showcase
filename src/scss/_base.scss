@@ -51,3 +51,39 @@ body {
     scale: 1.05;
   }
 }
+
+.totop-btn {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  z-index: 20;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+
+  i {
+    font-size: 1rem;
+  }
+
+  &:hover {
+    transform: scale(1.12);
+  }
+
+  &.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @include media-576 {
+    right: 16px;
+    bottom: 16px;
+    width: 42px;
+    height: 42px;
+  }
+}

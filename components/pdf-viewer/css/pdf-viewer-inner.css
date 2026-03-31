@@ -1,0 +1,39 @@
+/* 全域 CSS 變數 */
+:root {
+  --toolbar-height: 40px;
+}
+
+/* ============================================
+   color-mode 說明
+   ============================================
+   - 由 <pdf-viewer color-mode="light|dark|custom"> 控制
+   - 元件會在 viewer.html 的 <html> 上加入 data-color-mode 屬性
+   - 預設為 custom（不套用任何顏色模式）
+   ============================================ */
+
+/* 亮色模式（可自行調整） */
+html[data-color-mode="light"] #scaleSelect {
+  background: white ;
+  border: 1px solid #bbbbbc;
+}
+
+/* 深色模式（可自行調整） */
+html[data-color-mode="dark"] {
+  /* 例：background-color: #1f1f1f; */
+}
+
+/* 可選：pattern 背景 */
+.patternContainer {
+  background-image: url(../images/pdf-pattern.jpg);
+  background-size: 100%;
+  background-position: center;
+  background-repeat: repeat;
+}
+
+/* 工具列輸入框字體大小 */
+:is(#toolbarContainer #toolbarViewer) input.toolbarField,
+:is(#toolbarContainer #toolbarViewer) .toolbarField {
+  margin: 0;
+  font-size: 12px;
+}
+
