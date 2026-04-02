@@ -1,0 +1,114 @@
+@use "variables" as *;
+
+.marquee-ticker-page {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+.marquee-ticker-demo {
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  &__title {
+    font-size: 20px;
+    font-weight: 600;
+    color: $color-text-dark;
+  }
+}
+
+.marquee-ticker-card {
+  background: $color-bg-white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px $shadow-sm;
+  padding: 16px 24px;
+}
+
+.marquee-ticker-intro {
+  margin: 0 auto;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  &__title {
+    font-size: 20px;
+    font-weight: 600;
+    color: $color-text-dark;
+  }
+  &__text {
+    margin: 0;
+    line-height: 1.6;
+    color: $color-text-gray;
+  }
+}
+
+.marquee-ticker-spec {
+  background: $color-bg-white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px $shadow-sm;
+  padding: 24px;
+
+  &__title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 16px;
+    color: $color-text-dark;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 14px;
+
+    th,
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid $color-border-very-light;
+      vertical-align: top;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    th {
+      width: fit-content;
+      font-weight: 600;
+      color: $color-text-dark;
+      white-space: nowrap;
+    }
+
+    tr:last-child th,
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  &__guide {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      color: $color-text-gray;
+    }
+
+    &-link {
+      font-size: 14px;
+    }
+  }
+
+  @include media-576 {
+    padding: 16px;
+
+    &__table {
+      font-size: 13px;
+    }
+  }
+}

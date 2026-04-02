@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>跑馬燈展示</title>
+    <link rel="stylesheet" href="../../dist/css/main.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <main class="main-container marquee-ticker-page">
+      <h1 class="title">跑馬燈展示</h1>
+
+      <p class="base-button-purple">
+        <a href="../../index.html">← 返回首頁</a>
+      </p>
+
+      <section class="marquee-ticker-demo">
+        <h2 class="marquee-ticker-demo__title">跑馬燈使用範例</h2>
+        <article class="marquee-ticker-card">
+          <marquee-ticker
+            id="marquee-ticker"
+            direction="slide-left"
+            data-url="../data/marquee-ticker/marquee-ticker-items.json"
+          ></marquee-ticker>
+        </article>
+      </section>
+
+      <section class="marquee-ticker-intro">
+        <h2 class="marquee-ticker-intro__title">適用情境</h2>
+        <p class="marquee-ticker-intro__text">
+          適合用來展示全站公告、活動訊息或系統維護提醒，讓重要資訊以醒目的方式在頁面上持續曝光，不占用太多版面空間。
+        </p>
+      </section>
+
+      <section class="marquee-ticker-spec">
+        <h2 class="marquee-ticker-spec__title">技術規格摘要</h2>
+        <table class="marquee-ticker-spec__table">
+          <tbody>
+            <tr>
+              <th scope="row">顯示方式</th>
+              <td>
+                使用 CSS
+                動畫與位移效果實作平滑橫向滾動，依內容與容器寬度自動補齊重複項目，避免出現空白斷點。
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">客製化能力</th>
+              <td>
+                可以調整滾動速度、每條訊息之間的距離，以及上下留白，並支援從左往右或從右往左兩種滾動方向。
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">響應式行為</th>
+              <td>
+                在視窗大小或容器寬度變化時，會自動重新計算需要的內容長度與動畫時間，維持連續且自然的滾動節奏。
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">封裝與相容性</th>
+              <td>
+                採用 Web Components 標準與 Shadow DOM
+                封裝樣式與結構，不依賴第三方套件，支援現代主流瀏覽器。
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="marquee-ticker-spec__guide">
+          <p>想了解更多資料格式與整合方式，可以查看完整使用指南。</p>
+          <a
+            href="../../components/marquee-ticker/documents/guide.md"
+            class="base-button-purple marquee-ticker-spec__guide-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            開啟詳細指南（Markdown）
+          </a>
+        </div>
+      </section>
+
+      <button
+        id="totop-btn"
+        class="base-button-purple totop-btn is-hidden"
+        type="button"
+        aria-label="回到頁面頂端"
+        title="回到頂端"
+      >
+        <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+      </button>
+    </main>
+
+    <script
+      type="module"
+      src="../../components/marquee-ticker/js/marquee-ticker-component.js"
+    ></script>
+    <script src="../js/marquee-ticker.js"></script>
+  </body>
+</html>

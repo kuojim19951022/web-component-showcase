@@ -1,0 +1,18 @@
+[
+  {
+    "marqueeText": "✨ Marquee Ticker 支援 data-source 與 data-url 兩種資料來源；同時存在時會以 data-source 優先顯示",
+    "marqueeLink": ""
+  },
+  {
+    "marqueeText": "⚙️ 可透過 default-speed、item-gap、vertical-padding 彈性調整速度、項目間距與上下留白",
+    "marqueeLink": ""
+  },
+  {
+    "marqueeText": "↔️ direction 支援 slide-left / slide-right，能快速切換跑馬燈滾動方向",
+    "marqueeLink": ""
+  },
+  {
+    "marqueeText": "♻️ 元件會依容器寬度自動補齊重複項目，並在視窗尺寸改變時重新計算，維持連續平滑的滾動效果",
+    "marqueeLink": ""
+  }
+]
