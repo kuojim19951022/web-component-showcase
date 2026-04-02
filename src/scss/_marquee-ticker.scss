@@ -4,21 +4,32 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 40px;
+  gap: 32px;
 }
 
-.marquee-ticker-demo {
+.marquee-ticker-intro {
+  max-width: 800px;
   margin: 0 auto;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  text-align: left;
+
   &__title {
     font-size: 20px;
     font-weight: 600;
+    margin-bottom: 8px;
     color: $color-text-dark;
   }
+
+  &__text {
+    margin: 0;
+    line-height: 1.6;
+    color: $color-text-gray;
+  }
+}
+
+.marquee-ticker-demo {
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .marquee-ticker-card {
@@ -28,25 +39,9 @@
   padding: 16px 24px;
 }
 
-.marquee-ticker-intro {
-  margin: 0 auto;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  &__title {
-    font-size: 20px;
-    font-weight: 600;
-    color: $color-text-dark;
-  }
-  &__text {
-    margin: 0;
-    line-height: 1.6;
-    color: $color-text-gray;
-  }
-}
-
 .marquee-ticker-spec {
+  max-width: 960px;
+  margin: 0 auto 24px;
   background: $color-bg-white;
   border-radius: 12px;
   box-shadow: 0 4px 12px $shadow-sm;
@@ -75,7 +70,7 @@
     }
 
     th {
-      width: fit-content;
+      width: 120px;
       font-weight: 600;
       color: $color-text-dark;
       white-space: nowrap;
@@ -109,6 +104,10 @@
 
     &__table {
       font-size: 13px;
+
+      th {
+        width: 90px;
+      }
     }
   }
 }
