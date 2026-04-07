@@ -4,18 +4,21 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 32px;
 }
 
 .marquee-ticker-intro {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 
   &__title {
     font-size: 20px;
     font-weight: 600;
-    margin-bottom: 8px;
     color: $color-text-dark;
   }
 
@@ -27,7 +30,6 @@
 }
 
 .marquee-ticker-demo {
-  max-width: 960px;
   margin: 0 auto;
   width: 100%;
 }
@@ -40,24 +42,25 @@
 }
 
 .marquee-ticker-spec {
-  max-width: 960px;
-  margin: 0 auto 24px;
+  max-width: 1000px;
+  margin: 0 auto;
   background: $color-bg-white;
   border-radius: 12px;
   box-shadow: 0 4px 12px $shadow-sm;
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 
   &__title {
     font-size: 20px;
     font-weight: 600;
-    margin: 0 0 16px;
     color: $color-text-dark;
   }
 
   &__table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 16px;
     font-size: 14px;
 
     th,
@@ -79,23 +82,6 @@
     tr:last-child th,
     tr:last-child td {
       border-bottom: none;
-    }
-  }
-
-  &__guide {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-
-    p {
-      margin: 0;
-      font-size: 14px;
-      color: $color-text-gray;
-    }
-
-    &-link {
-      font-size: 14px;
     }
   }
 
