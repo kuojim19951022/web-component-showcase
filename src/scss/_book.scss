@@ -1,11 +1,123 @@
 @use "variables" as *;
 
+.book-content {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  padding: 40px 0 0 0;
+  .load-more-container {
+    padding: 0 0 40px 0;
+  }
+}
+
 .book-page {
   box-sizing: border-box;
   display: flex;
   gap: 40px;
   flex-direction: column;
   align-items: center;
+  padding: 0;
+}
+
+.book-content-intro {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 40px;
+  color: $color-text-dark;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  &__text {
+    margin: 0;
+    line-height: 1.6;
+    color: $color-text-gray;
+
+    a {
+      color: $color-primary;
+      text-decoration: underline;
+    }
+  }
+
+  &__note {
+    margin: 0;
+    color: $color-text-gray;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+
+.book-list-section {
+  width: 100%;
+}
+
+.book-spec {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 40px;
+
+  .book-spec-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 24px;
+    background: $color-bg-white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px $shadow-sm;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: $color-text-dark;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+
+    th,
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid $color-border-very-light;
+      vertical-align: top;
+      text-align: left;
+      line-height: 1.6;
+      color: $color-text-gray;
+    }
+
+    th {
+      width: 108px;
+      white-space: nowrap;
+      color: $color-text-dark;
+      font-weight: 600;
+    }
+
+    tr:last-child th,
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  @include media-576 {
+    &__table {
+      font-size: 13px;
+
+      th {
+        width: 88px;
+      }
+    }
+  }
 }
 
 // 書架頂部
@@ -40,7 +152,6 @@
     z-index: 1;
   }
 
-  // 初次進頁面尚未完成 grid 渲染時，先隱藏 top 裝飾，避免露出「空書架」區塊
   &.is-loading {
     opacity: 0;
     pointer-events: none;
@@ -376,4 +487,3 @@
     }
   }
 }
-

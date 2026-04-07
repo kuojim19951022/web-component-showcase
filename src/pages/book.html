@@ -13,20 +13,83 @@
     />
   </head>
   <body>
-    <div class="">
-      <div class="main-container book-page">
+    <main class="book-content">
+      <section class="main-container book-page">
         <h1 class="title">PDF 閱讀器展示</h1>
         <p class="base-button-purple">
           <a href="../../index.html">← 返回首頁</a>
         </p>
-      </div>
+      </section>
 
-      <div class="bookshelf-top-item is-loading" aria-hidden="true"></div>
-      <div class="book-grid-container">
-        <!-- 書本項目 -->
-      </div>
+      <section class="book-content-intro">
+        <h2 class="book-content-intro__title">頁面說明</h2>
+        <p class="book-content-intro__text">
+          本頁面以「PDF 閱讀器 Web
+          Component」為核心展示目標：使用者在書卡上點擊「閱讀」後，會進入獨立閱讀頁並由元件接手
+          PDF
+          載入與檢視流程。書單載入、封面顯示與下載按鈕等互動設計，主要用途是提供完整且直覺的操作情境，讓使用者能在接近真實產品的流程中體驗元件能力。書籍與封面素材來源為
+          <a
+            href="https://www.aliceandbooks.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Alice &amp; Books</a
+          >，屬於公有領域（Public Domain）資源，僅供示範用途使用，無版權疑慮。
+        </p>
+        <p class="book-content-intro__note">
+          註：為控制示範專案體積，PDF 內容以前 10
+          本作為主樣本，後續書項使用重複樣本進行互動流程示意。
+        </p>
+      </section>
 
-      <div class="load-more-container">
+      <section class="book-spec" aria-label="技術規格摘要">
+        <div class="book-spec-container">
+          <h2 class="book-spec__title">技術規格摘要</h2>
+          <table class="book-spec__table">
+            <tbody>
+              <tr>
+                <th scope="row">核心能力</th>
+                <td>
+                  以 PDF.js 為底層，封裝為可重用的 PDF 閱讀器 Web Component。
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">啟動流程</th>
+                <td>
+                  使用者點擊「閱讀」後，透過書籍 id 對應 PDF
+                  資源並交由元件載入顯示。
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">頁面互動</th>
+                <td>
+                  書單載入、封面顯示、下載按鈕與回頂操作，用於優化整體閱讀體驗與導覽效率。
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">容錯策略</th>
+                <td>
+                  當封面或檔案缺失時提供替代顯示與禁用狀態，避免流程中斷與錯誤操作。
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">資源授權</th>
+                <td>
+                  示範用書籍與封面來源為公有領域素材，符合作品展示與學習用途。
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="book-list-section" aria-label="書籍清單">
+        <div class="bookshelf-top-item is-loading" aria-hidden="true"></div>
+        <div class="book-grid-container">
+          <!-- 書本項目 -->
+        </div>
+      </section>
+
+      <section class="load-more-container" aria-label="分頁載入">
         <a
           id="load-more-book"
           class="base-button-purple"
@@ -35,7 +98,7 @@
         >
           載入更多 <i class="fa-solid fa-arrows-rotate"></i>
         </a>
-      </div>
+      </section>
 
       <button
         id="totop-btn"
@@ -46,7 +109,7 @@
       >
         <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
       </button>
-    </div>
+    </main>
 
     <!-- Handlebars 模板 -->
     <script id="book-item-template" type="text/x-handlebars-template">
