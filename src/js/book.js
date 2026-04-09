@@ -73,7 +73,6 @@ const $loadMoreBtn = document.getElementById("load-more-book");
 const $loadMoreContainer = document.querySelector(".load-more-container");
 const $bookContainer = document.querySelector(".book-grid-container");
 const $shelfTop = document.querySelector(".bookshelf-top-item");
-const $toTopBtn = document.getElementById("totop-btn");
 let shelfTopRevealed = false;
 
 // ── 抓取經書資料 ───────────────────────────────────────
@@ -139,12 +138,6 @@ function updateLoadMoreButton(nextOffset, hasMore) {
   $loadMoreContainer.style.display = $loadMoreBtn.style.display = display;
 }
 
-function toggleToTopBtn() {
-  if (!$toTopBtn) return;
-  const shouldShow = window.scrollY > 240;
-  $toTopBtn.classList.toggle("is-hidden", !shouldShow);
-}
-
 // 渲染書本列表(Handlebars 模板引擎編譯)
 function renderBooks(list) {
   if (!$bookContainer) return;
@@ -173,7 +166,6 @@ window.addEventListener("resize", () => {
 document.addEventListener("DOMContentLoaded", () => {
   // 初始載入
   fetchBooks(0);
-  toggleToTopBtn();
 
   // 載入更多
   if ($loadMoreBtn) {
@@ -182,12 +174,4 @@ document.addEventListener("DOMContentLoaded", () => {
       fetchBooks(offset);
     });
   }
-
-  if ($toTopBtn) {
-    $toTopBtn.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-  }
 });
-
-window.addEventListener("scroll", toggleToTopBtn, { passive: true });

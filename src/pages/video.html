@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>YouTube 彈窗展示</title>
     <link rel="stylesheet" href="../../dist/css/main.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
   </head>
   <body>
     <main class="main-container video-page">
@@ -42,7 +48,7 @@
               <td>可控制標題、描述、相關影片顯示與播放器參數。</td>
             </tr>
             <tr>
-              <th scope="row">播放器彈性</th>
+              <th scope="row">播放彈性</th>
               <td>
                 可選擇不同播放器類型，在首屏效能（lite-youtube）、整合直覺度（iframe）與進階控制彈性（youtube-iframe-api）間取捨。
               </td>
@@ -65,6 +71,16 @@
           <!-- 影片項目由 API getVideoList 載入後渲染 -->
         </div>
       </section>
+
+      <button
+        id="totop-btn"
+        class="base-button-purple totop-btn is-hidden"
+        type="button"
+        aria-label="回到頁面頂端"
+        title="回到頂端"
+      >
+        <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+      </button>
     </main>
 
     <youtube-modal data-url="../data/video/video-details.json"></youtube-modal>
@@ -89,6 +105,7 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>
+    <script src="../js/custom.js"></script>
     <script
       type="module"
       src="../../components/youtube-modal/src/index.js"

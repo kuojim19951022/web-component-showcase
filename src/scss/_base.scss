@@ -10,7 +10,7 @@ body {
   margin: 0 auto;
   padding: 80px 40px;
   @include media-768 {
-    padding: 40px;
+    padding: 20px;
   }
 }
 
@@ -63,7 +63,6 @@ body {
       width: 120px;
       font-weight: 600;
       color: $color-text-dark;
-      white-space: nowrap;
     }
 
     tr:last-child th,
@@ -72,14 +71,14 @@ body {
     }
   }
 
-  @include media-576 {
+  @include media-768 {
     padding: 16px;
 
     &__table {
-      font-size: 13px;
+      font-size: 14px;
 
       th {
-        width: 90px;
+        width: 56px;
       }
     }
   }
