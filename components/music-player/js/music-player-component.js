@@ -1,23 +1,45 @@
+function detectDefaultResourcePath() {
+  const fileName = "music-player-component.js";
+
+  const fromCurrentScript = document.currentScript?.src;
+  if (fromCurrentScript) {
+    const url = new URL(fromCurrentScript, window.location.href);
+    return url.pathname.replace(new RegExp(`/js/${fileName}$`), "");
+  }
+
+  const scriptEl = Array.from(document.scripts).find((script) =>
+    (script.getAttribute("src") || "").includes(`/js/${fileName}`),
+  );
+  if (scriptEl) {
+    const src = scriptEl.getAttribute("src") || "";
+    const url = new URL(src, window.location.href);
+    return url.pathname.replace(new RegExp(`/js/${fileName}$`), "");
+  }
+
+  return "/components/music-player";
+}
+
+const INTERNAL_RESOURCE_BASE = detectDefaultResourcePath();
+
 class MusicPlayer extends HTMLElement {
   // ========== 配置常數 ==========
   static CONFIG = {
-    DEFAULT_RESOURCE_PATH: '/web/res/zh_TW/components/music-player',
     DEFAULT_VOLUME: 0.7,
     DEFAULT_REPEAT: false,
     DEFAULT_SHUFFLE: false,
-    AUDIO_READY_STATE: 3, // HAVE_FUTURE_DATA
+    AUDIO_READY_STATE: 3,
     MOBILE_REGEX:
       /iPhone|iPad|iPod|Android|Mobile|BlackBerry|IEMobile|Opera Mini/i,
     DEFAULT_ICONS: {
-      'icon-music': 'icon-music.svg',
-      'icon-repeat': 'icon-repeat.svg',
-      'icon-prev': 'icon-prev.svg',
-      'icon-play': 'icon-play.svg',
-      'icon-pause': 'icon-pause.svg',
-      'icon-next': 'icon-next.svg',
-      'icon-shuffle': 'icon-shuffle.svg',
-      'icon-volume': 'icon-volume.svg',
-      'icon-volume-mute': 'icon-volume-mute.svg',
+      "icon-music": "icon-music.svg",
+      "icon-repeat": "icon-repeat.svg",
+      "icon-prev": "icon-prev.svg",
+      "icon-play": "icon-play.svg",
+      "icon-pause": "icon-pause.svg",
+      "icon-next": "icon-next.svg",
+      "icon-shuffle": "icon-shuffle.svg",
+      "icon-volume": "icon-volume.svg",
+      "icon-volume-mute": "icon-volume-mute.svg",
     },
   };
 
@@ -28,16 +50,27 @@ class MusicPlayer extends HTMLElement {
     super();
     this.attachShadow({ mode: "open" });
     this.CONFIG = {
-      RESOURCE_PATH: MusicPlayer.CONFIG.DEFAULT_RESOURCE_PATH,
+      RESOURCE_PATH: INTERNAL_RESOURCE_BASE,
       ...MusicPlayer.CONFIG,
     };
     this.state = {
-      currentMusicId: null, isPlaying: false, isShuffleMode: false, isRepeatMode: false,
-      isDragging: false, isVolumeDragging: false, isHandlingVolumeEvent: false,
-      isMuted: true, savedVolume: MusicPlayer.CONFIG.DEFAULT_VOLUME,
-      currentVolume: MusicPlayer.CONFIG.DEFAULT_VOLUME, hasUserPlayed: false,
-      isLoading: false, isSeeking: false, pendingPlayback: false,
-      progressUpdateRequested: false, customIcons: {}, playHistory: [] 
+      currentMusicId: null,
+      isPlaying: false,
+      isShuffleMode: false,
+      isRepeatMode: false,
+      isDragging: false,
+      isVolumeDragging: false,
+      isHandlingVolumeEvent: false,
+      isMuted: true,
+      savedVolume: MusicPlayer.CONFIG.DEFAULT_VOLUME,
+      currentVolume: MusicPlayer.CONFIG.DEFAULT_VOLUME,
+      hasUserPlayed: false,
+      isLoading: false,
+      isSeeking: false,
+      pendingPlayback: false,
+      progressUpdateRequested: false,
+      customIcons: {},
+      playHistory: [],
     };
     this.musicList = [];
     this.audioContext = null;
@@ -72,7 +105,9 @@ class MusicPlayer extends HTMLElement {
   }
 
   // ========== 工具方法 ==========
-  static isMobileDevice() { return MusicPlayer.CONFIG.MOBILE_REGEX.test(navigator.userAgent); }
+  static isMobileDevice() {
+    return MusicPlayer.CONFIG.MOBILE_REGEX.test(navigator.userAgent);
+  }
   static isElementVisible(element) {
     if (!element) return false;
     return window.getComputedStyle(element).display !== "none";
@@ -83,7 +118,9 @@ class MusicPlayer extends HTMLElement {
     const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   }
-  static normalizePath(path) { return path ? path.replace(/\/+/g, '/') : ''; }
+  static normalizePath(path) {
+    return path ? path.replace(/\/+/g, "/") : "";
+  }
 
   #handleKeyboardEvent(element, callback) {
     if (!element) return;
@@ -106,22 +143,26 @@ class MusicPlayer extends HTMLElement {
       if (this.state[stateKey]) {
         this.state[stateKey] = false;
         element.classList.remove("dragging");
-        try { element.releasePointerCapture(e.pointerId); } catch (err) {}
-        element.removeEventListener('pointermove', handlePointerMove);
-        element.removeEventListener('pointerup', stopDrag);
-        element.removeEventListener('pointercancel', stopDrag);
+        try {
+          element.releasePointerCapture(e.pointerId);
+        } catch (err) {}
+        element.removeEventListener("pointermove", handlePointerMove);
+        element.removeEventListener("pointerup", stopDrag);
+        element.removeEventListener("pointercancel", stopDrag);
       }
     };
 
     element.onpointerdown = (e) => {
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
       this.state[stateKey] = true;
       element.classList.add("dragging");
-      try { element.setPointerCapture(e.pointerId); } catch (err) {}
+      try {
+        element.setPointerCapture(e.pointerId);
+      } catch (err) {}
       onUpdate(e);
-      element.addEventListener('pointermove', handlePointerMove);
-      element.addEventListener('pointerup', stopDrag);
-      element.addEventListener('pointercancel', stopDrag);
+      element.addEventListener("pointermove", handlePointerMove);
+      element.addEventListener("pointerup", stopDrag);
+      element.addEventListener("pointercancel", stopDrag);
     };
   }
 
@@ -140,12 +181,16 @@ class MusicPlayer extends HTMLElement {
       this.gainNode.connect(this.audioContext.destination);
       this.useWebAudio = true;
       return true;
-    } catch (e) { return false; }
+    } catch (e) {
+      return false;
     }
+  }
 
   async #ensureAudioContext() {
     if (this.audioContext && this.audioContext.state === "suspended") {
-      try { await this.audioContext.resume(); } catch (e) {}
+      try {
+        await this.audioContext.resume();
+      } catch (e) {}
     }
   }
 
@@ -153,44 +198,63 @@ class MusicPlayer extends HTMLElement {
     if (document.getElementById("music-player-portal-style")) return;
     const style = document.createElement("style");
     style.id = "music-player-portal-style";
-    style.textContent = typeof getPortalStyles === 'function' ? getPortalStyles() : '';
+    style.textContent =
+      typeof getPortalStyles === "function" ? getPortalStyles() : "";
     document.head.appendChild(style);
   }
 
   // ========== 核心方法 ==========
   #setMusicInfo(id) {
     if (!id) return;
-    const music = this.musicList.find(m => String(m.id) === String(id));
+    const music = this.musicList.find((m) => String(m.id) === String(id));
     if (!music) return;
-    if (String(this.state.currentMusicId) === String(id) && this.elements.audio.src) {
+    if (
+      String(this.state.currentMusicId) === String(id) &&
+      this.elements.audio.src
+    ) {
       return;
     }
 
     this.state.isSeeking = false;
     this.state.currentMusicId = music.id;
-    
+
     const resolvedSrc = this.#resolveResourcePath(music.src);
     this.elements.audio.src = resolvedSrc;
     this.elements.audio.load();
     this.#updateMusicUI(music);
-      }
+  }
 
   #loadConfigFromAttributes() {
     const getAttr = (name) => this.getAttribute(name);
     this.CONFIG = {
       ...MusicPlayer.CONFIG,
-      RESOURCE_PATH: getAttr("resource-path") || MusicPlayer.CONFIG.DEFAULT_RESOURCE_PATH,
-      DEFAULT_VOLUME: this.#parseFloat(getAttr("default-volume"), MusicPlayer.CONFIG.DEFAULT_VOLUME, true),
-      DEFAULT_REPEAT: this.#parseBoolean(getAttr("default-repeat"), MusicPlayer.CONFIG.DEFAULT_REPEAT),
-      DEFAULT_SHUFFLE: this.#parseBoolean(getAttr("default-shuffle"), MusicPlayer.CONFIG.DEFAULT_SHUFFLE),
+      RESOURCE_PATH: INTERNAL_RESOURCE_BASE,
+      DEFAULT_VOLUME: this.#parseFloat(
+        getAttr("default-volume"),
+        MusicPlayer.CONFIG.DEFAULT_VOLUME,
+        true,
+      ),
+      DEFAULT_REPEAT: this.#parseBoolean(
+        getAttr("default-repeat"),
+        MusicPlayer.CONFIG.DEFAULT_REPEAT,
+      ),
+      DEFAULT_SHUFFLE: this.#parseBoolean(
+        getAttr("default-shuffle"),
+        MusicPlayer.CONFIG.DEFAULT_SHUFFLE,
+      ),
     };
-    this.state.savedVolume = this.state.currentVolume = this.CONFIG.DEFAULT_VOLUME;
+    this.state.savedVolume = this.state.currentVolume =
+      this.CONFIG.DEFAULT_VOLUME;
     this.state.isRepeatMode = this.CONFIG.DEFAULT_REPEAT;
     this.state.isShuffleMode = this.CONFIG.DEFAULT_SHUFFLE;
-    
+
     const customIconsAttr = getAttr("custom-icons");
     if (customIconsAttr) {
-      try { this.setCustomIcons(JSON.parse(customIconsAttr)); } catch (e) { console.warn('Icons parse error', e); }
+      try {
+        this.setCustomIcons(JSON.parse(customIconsAttr));
+      } catch (e) {
+        console.warn("Icons parse error", e);
+      }
     }
   }
 
@@ -201,35 +265,45 @@ class MusicPlayer extends HTMLElement {
   }
   #parseBoolean(v, d) {
     if (!v) return d;
-    return ['true', '1', 'yes', 'on'].includes(String(v).toLowerCase());
-    }
+    return ["true", "1", "yes", "on"].includes(String(v).toLowerCase());
+  }
 
   async #loadCSS() {
     if (MusicPlayer.cssCache) return MusicPlayer.cssCache;
-    const path = MusicPlayer.normalizePath(`${this.CONFIG.RESOURCE_PATH}/css/music-player.css`);
+    const path = MusicPlayer.normalizePath(
+      `${this.CONFIG.RESOURCE_PATH}/css/music-player.css`,
+    );
     try {
       const res = await fetch(path);
-      return MusicPlayer.cssCache = res.ok ? await res.text() : '';
-    } catch (e) { return ''; }
+      return (MusicPlayer.cssCache = res.ok ? await res.text() : "");
+    } catch (e) {
+      return "";
+    }
   }
 
   async #loadTemplate() {
-    if (typeof getMusicPlayerHTML === 'function') return true;
-    if (MusicPlayer.templateLoadPromise) return await MusicPlayer.templateLoadPromise;
-    const path = MusicPlayer.normalizePath(`${this.CONFIG.RESOURCE_PATH}/js/music-player-template.js`);
-    return MusicPlayer.templateLoadPromise = new Promise((resolve) => {
-      const s = document.createElement('script');
+    if (typeof getMusicPlayerHTML === "function") return true;
+    if (MusicPlayer.templateLoadPromise)
+      return await MusicPlayer.templateLoadPromise;
+    const path = MusicPlayer.normalizePath(
+      `${this.CONFIG.RESOURCE_PATH}/js/music-player-template.js`,
+    );
+    return (MusicPlayer.templateLoadPromise = new Promise((resolve) => {
+      const s = document.createElement("script");
       s.src = path;
-      s.onload = () => setTimeout(() => resolve(typeof getMusicPlayerHTML === 'function'), 10);
+      s.onload = () =>
+        setTimeout(() => resolve(typeof getMusicPlayerHTML === "function"), 10);
       s.onerror = () => resolve(false);
       document.head.appendChild(s);
-    });
+    }));
   }
 
   async #render() {
     const css = await this.#loadCSS();
     const loaded = await this.#loadTemplate();
-    const html = loaded ? getMusicPlayerHTML(this.CONFIG.RESOURCE_PATH) : '<div style="color:red">Load Error</div>';
+    const html = loaded
+      ? getMusicPlayerHTML(this.CONFIG.RESOURCE_PATH)
+      : '<div style="color:red">Load Error</div>';
     this.shadowRoot.innerHTML = `<style>${css}</style>${html}`;
   }
 
@@ -239,13 +313,17 @@ class MusicPlayer extends HTMLElement {
     this.elements = {
       audio: get("background-audio"),
       playPauseBtn: get("play-pause-btn"),
-      prevBtn: get("prev-btn"), nextBtn: get("next-btn"),
-      shuffleBtn: get("shuffle-btn"), repeatBtn: get("repeat-btn"),
+      prevBtn: get("prev-btn"),
+      nextBtn: get("next-btn"),
+      shuffleBtn: get("shuffle-btn"),
+      repeatBtn: get("repeat-btn"),
       volumeProgressBar: get("volume-progress-bar"),
       volumeProgressFill: get("volume-progress-fill"),
-      volumeToggleBtn: get("volume-toggle-btn"), volumeIcon: get("volume-icon"),
+      volumeToggleBtn: get("volume-toggle-btn"),
+      volumeIcon: get("volume-icon"),
       progressFill: get("progress-fill"),
-      currentTimeDisplay: get("current-time"), totalTimeDisplay: get("total-time"),
+      currentTimeDisplay: get("current-time"),
+      totalTimeDisplay: get("total-time"),
       currentSongTitle: get("current-song-title"),
       currentSongCover: get("current-song-cover"),
       currentSongDefaultCover: get("current-song-default-cover"),
@@ -254,34 +332,48 @@ class MusicPlayer extends HTMLElement {
     };
   }
 
-  #validateElements() { return !!(this.elements.audio && this.elements.playPauseBtn); }
-  #initDeviceClass() { if (MusicPlayer.isMobileDevice()) document.body.classList.add("mobile-device"); }
+  #validateElements() {
+    return !!(this.elements.audio && this.elements.playPauseBtn);
+  }
+  #initDeviceClass() {
+    if (MusicPlayer.isMobileDevice())
+      document.body.classList.add("mobile-device");
+  }
 
   #initDefaultState() {
     const { audio, repeatBtn, shuffleBtn } = this.elements;
     audio.preload = "metadata";
     audio.muted = true;
-    if (!MusicPlayer.isMobileDevice()) audio.volume = this.CONFIG.DEFAULT_VOLUME;
-    if (repeatBtn) repeatBtn.classList.toggle("active", this.state.isRepeatMode);
-    if (shuffleBtn) shuffleBtn.classList.toggle("active", this.state.isShuffleMode);
+    if (!MusicPlayer.isMobileDevice())
+      audio.volume = this.CONFIG.DEFAULT_VOLUME;
+    if (repeatBtn)
+      repeatBtn.classList.toggle("active", this.state.isRepeatMode);
+    if (shuffleBtn)
+      shuffleBtn.classList.toggle("active", this.state.isShuffleMode);
     this.#updateVolumeProgress();
     this.#updateMuteUI();
   }
 
   // ========== 圖示與路徑 ==========
   #getIconPath(name) {
-    const key = name.replace(/\.svg$/, '');
+    const key = name.replace(/\.svg$/, "");
     const custom = this.state.customIcons[key];
     if (custom) {
       if (/^(?:\/|https?:\/\/|\/\/)/.test(custom)) {
         return custom;
       }
       const imageExtensions = /\.(svg|png|jpg|jpeg|gif|webp)$/i;
-      const customFileName = imageExtensions.test(custom) ? custom : `${custom}.svg`;
-      return MusicPlayer.normalizePath(`${this.CONFIG.RESOURCE_PATH}/images/${customFileName}`);
-  }
+      const customFileName = imageExtensions.test(custom)
+        ? custom
+        : `${custom}.svg`;
+      return MusicPlayer.normalizePath(
+        `${this.CONFIG.RESOURCE_PATH}/images/${customFileName}`,
+      );
+    }
     const fileName = MusicPlayer.CONFIG.DEFAULT_ICONS[key] || name;
-    return MusicPlayer.normalizePath(`${this.CONFIG.RESOURCE_PATH}/images/${fileName}`);
+    return MusicPlayer.normalizePath(
+      `${this.CONFIG.RESOURCE_PATH}/images/${fileName}`,
+    );
   }
 
   #resolveResourcePath(path) {
@@ -297,12 +389,16 @@ class MusicPlayer extends HTMLElement {
     const icon = btn?.querySelector("img");
     if (!icon) return;
     btn.classList.toggle("loading", this.state.isLoading);
-    icon.src = this.#getIconPath(this.state.isPlaying ? 'icon-pause.svg' : 'icon-play.svg');
+    icon.src = this.#getIconPath(
+      this.state.isPlaying ? "icon-pause.svg" : "icon-play.svg",
+    );
   }
 
   #updateMuteUI() {
     if (this.elements.volumeIcon) {
-      this.elements.volumeIcon.src = this.#getIconPath(this.state.isMuted ? 'icon-volume-mute.svg' : 'icon-volume.svg');
+      this.elements.volumeIcon.src = this.#getIconPath(
+        this.state.isMuted ? "icon-volume-mute.svg" : "icon-volume.svg",
+      );
     }
   }
 
@@ -313,37 +409,44 @@ class MusicPlayer extends HTMLElement {
   }
 
   #updateProgress = () => {
-    const { audio, progressFill, currentTimeDisplay, totalTimeDisplay } = this.elements;
+    const { audio, progressFill, currentTimeDisplay, totalTimeDisplay } =
+      this.elements;
     if (!audio.duration || this.state.progressUpdateRequested) return;
     this.state.progressUpdateRequested = true;
     requestAnimationFrame(() => {
       progressFill.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
-      currentTimeDisplay.textContent = MusicPlayer.formatTime(audio.currentTime);
+      currentTimeDisplay.textContent = MusicPlayer.formatTime(
+        audio.currentTime,
+      );
       totalTimeDisplay.textContent = MusicPlayer.formatTime(audio.duration);
       this.state.progressUpdateRequested = false;
     });
   };
 
   #updateMusicUI(music) {
-    const { currentSongTitle, currentSongCover, currentSongDefaultCover } = this.elements;
+    const { currentSongTitle, currentSongCover, currentSongDefaultCover } =
+      this.elements;
     currentSongTitle.textContent = music.title;
     const hasImg = !!music.image;
     currentSongCover.src = music.image || "";
     currentSongCover.style.display = hasImg ? "block" : "none";
     currentSongDefaultCover.style.display = hasImg ? "none" : "flex";
-    this.shadowRoot.querySelectorAll(".music-item").forEach(item => {
-      item.classList.toggle("playing", String(item.getAttribute('data-id')) === String(music.id));
+    this.shadowRoot.querySelectorAll(".music-item").forEach((item) => {
+      item.classList.toggle(
+        "playing",
+        String(item.getAttribute("data-id")) === String(music.id),
+      );
     });
   }
 
   #updateAllIcons() {
     const selectors = {
-      '#current-song-default-cover .icon-music': 'icon-music.svg',
-      '#repeat-btn .control-icon': 'icon-repeat.svg',
-      '#prev-btn .control-icon': 'icon-prev.svg',
-      '#next-btn .control-icon': 'icon-next.svg',
-      '#shuffle-btn .control-icon': 'icon-shuffle.svg',
-      '.list-title-icon': 'icon-music.svg'
+      "#current-song-default-cover .icon-music": "icon-music.svg",
+      "#repeat-btn .control-icon": "icon-repeat.svg",
+      "#prev-btn .control-icon": "icon-prev.svg",
+      "#next-btn .control-icon": "icon-next.svg",
+      "#shuffle-btn .control-icon": "icon-shuffle.svg",
+      ".list-title-icon": "icon-music.svg",
     };
     Object.entries(selectors).forEach(([sel, icon]) => {
       const el = this.shadowRoot.querySelector(sel);
@@ -355,12 +458,18 @@ class MusicPlayer extends HTMLElement {
 
   // ========== 播放邏輯 ==========
   #playMusic(id) {
-    const music = this.musicList.find(m => String(m.id) === String(id));
+    const music = this.musicList.find((m) => String(m.id) === String(id));
     if (!music) return;
-    if (this.state.currentMusicId && String(this.state.currentMusicId) !== String(id)) {
+    if (
+      this.state.currentMusicId &&
+      String(this.state.currentMusicId) !== String(id)
+    ) {
       this.state.playHistory.push(this.state.currentMusicId);
       if (this.state.playHistory.length > 50) this.state.playHistory.shift();
-      sessionStorage.setItem('musicPlayHistory', JSON.stringify(this.state.playHistory));
+      sessionStorage.setItem(
+        "musicPlayHistory",
+        JSON.stringify(this.state.playHistory),
+      );
     }
     this.#setMusicInfo(id);
     this.#tryPlayAudio();
@@ -370,13 +479,16 @@ class MusicPlayer extends HTMLElement {
     const { audio } = this.elements;
     const play = async () => {
       await this.#ensureAudioContext();
-      audio.play().then(() => {
+      audio
+        .play()
+        .then(() => {
           this.state.isPlaying = true;
           this.state.hasUserPlayed = true;
           this.#updatePlayPauseButton();
-      }).catch(e => console.warn('Play error', e));
+        })
+        .catch((e) => console.warn("Play error", e));
     };
-    
+
     if (audio.readyState >= this.CONFIG.AUDIO_READY_STATE) play();
     else audio.addEventListener("canplay", play, { once: true });
   }
@@ -391,16 +503,22 @@ class MusicPlayer extends HTMLElement {
     else this.elements.audio.play();
   };
 
-  #getDefaultMusic() { return this.musicList.find(m => m.isDefault) || this.musicList[0]; }
-  
+  #getDefaultMusic() {
+    return this.musicList.find((m) => m.isDefault) || this.musicList[0];
+  }
+
   #playNext = () => {
     const list = this.musicList;
     let nextId;
     if (this.state.isShuffleMode) {
-      const other = list.filter(m => String(m.id) !== String(this.state.currentMusicId));
+      const other = list.filter(
+        (m) => String(m.id) !== String(this.state.currentMusicId),
+      );
       nextId = other[Math.floor(Math.random() * other.length)].id;
     } else {
-      const idx = list.findIndex(m => String(m.id) === String(this.state.currentMusicId));
+      const idx = list.findIndex(
+        (m) => String(m.id) === String(this.state.currentMusicId),
+      );
       nextId = list[(idx + 1) % list.length].id;
     }
     this.#playMusic(nextId);
@@ -408,16 +526,21 @@ class MusicPlayer extends HTMLElement {
 
   #playPrevious = () => {
     if (this.musicList.length === 0) return;
-    
+
     let prevId;
     if (this.state.playHistory.length > 0) {
       prevId = this.state.playHistory.pop();
-      sessionStorage.setItem('musicPlayHistory', JSON.stringify(this.state.playHistory));
+      sessionStorage.setItem(
+        "musicPlayHistory",
+        JSON.stringify(this.state.playHistory),
+      );
       this.#setMusicInfo(prevId);
       this.#tryPlayAudio();
     } else {
       const list = this.musicList;
-      const idx = list.findIndex(m => String(m.id) === String(this.state.currentMusicId));
+      const idx = list.findIndex(
+        (m) => String(m.id) === String(this.state.currentMusicId),
+      );
       const prevIdx = (idx - 1 + list.length) % list.length;
       prevId = list[prevIdx].id;
       this.#playMusic(prevId);
@@ -461,18 +584,24 @@ class MusicPlayer extends HTMLElement {
     if (this._mutePopup) return;
     const p = document.createElement("div");
     p.id = "volume-mute-portal";
-    p.innerHTML = getMutePopupHTML(this.#getIconPath('icon-volume-mute.svg'));
+    p.innerHTML = getMutePopupHTML(this.#getIconPath("icon-volume-mute.svg"));
     document.body.appendChild(p);
     this._mutePopup = p;
-    setTimeout(() => p.style.opacity = "1", 10);
-    
+    setTimeout(() => (p.style.opacity = "1"), 10);
+
     const confirmBtn = p.querySelector(".volume-mute-popup-confirm");
     const cancelBtn = p.querySelector(".volume-mute-popup-cancel");
-    
-    confirmBtn.onclick = () => { this.#unmute(true); this.#hideMutePopup(); };
+
+    confirmBtn.onclick = () => {
+      this.#unmute(true);
+      this.#hideMutePopup();
+    };
     cancelBtn.onclick = () => this.#hideMutePopup();
-    
-    this.#handleKeyboardEvent(confirmBtn, () => { this.#unmute(true); this.#hideMutePopup(); });
+
+    this.#handleKeyboardEvent(confirmBtn, () => {
+      this.#unmute(true);
+      this.#hideMutePopup();
+    });
     this.#handleKeyboardEvent(cancelBtn, () => this.#hideMutePopup());
 
     setTimeout(() => confirmBtn.focus(), 100);
@@ -494,20 +623,25 @@ class MusicPlayer extends HTMLElement {
     o.innerHTML = getInteractionPromptHTML(hasUnmuted);
     document.body.appendChild(o);
     this._interactionOverlay = o;
-    setTimeout(() => o.style.opacity = "1", 10);
-    
+    setTimeout(() => (o.style.opacity = "1"), 10);
+
     o.onclick = async () => {
-          this.#initWebAudio();
+      this.#initWebAudio();
       await this.#ensureAudioContext();
       const targetId = this.#getDefaultMusic().id;
-      if (String(this.state.currentMusicId) === String(targetId) && this.elements.audio.src) {
+      if (
+        String(this.state.currentMusicId) === String(targetId) &&
+        this.elements.audio.src
+      ) {
         this.#tryPlayAudio();
       } else {
         this.#playMusic(targetId);
       }
-      if (sessionStorage.getItem("musicPlayerUnmuted") === "true") this.#unmute(false);
+      if (sessionStorage.getItem("musicPlayerUnmuted") === "true")
+        this.#unmute(false);
       this.#hideInteractionPrompt();
-      if (sessionStorage.getItem("musicPlayerUnmuted") !== "true") setTimeout(() => this.#showMutePopup(), 500);
+      if (sessionStorage.getItem("musicPlayerUnmuted") !== "true")
+        setTimeout(() => this.#showMutePopup(), 500);
     };
   }
 
@@ -517,27 +651,61 @@ class MusicPlayer extends HTMLElement {
       target.style.opacity = "0";
       this._interactionOverlay = null;
       setTimeout(() => target.remove(), 300);
-        }
+    }
   }
 
   // ========== 事件監聽 ==========
   #initEventListeners() {
-    const { playPauseBtn, prevBtn, nextBtn, shuffleBtn, repeatBtn, volumeToggleBtn, audio, volumeProgressBar, progressBar } = this.elements;
+    const {
+      playPauseBtn,
+      prevBtn,
+      nextBtn,
+      shuffleBtn,
+      repeatBtn,
+      volumeToggleBtn,
+      audio,
+      volumeProgressBar,
+      progressBar,
+    } = this.elements;
     playPauseBtn.onclick = this.#togglePlayPause;
     prevBtn.onclick = this.#playPrevious;
     nextBtn.onclick = this.#playNext;
-    shuffleBtn.onclick = () => { this.state.isShuffleMode = !this.state.isShuffleMode; shuffleBtn.classList.toggle("active", this.state.isShuffleMode); };
-    repeatBtn.onclick = () => { this.state.isRepeatMode = !this.state.isRepeatMode; repeatBtn.classList.toggle("active", this.state.isRepeatMode); };
+    shuffleBtn.onclick = () => {
+      this.state.isShuffleMode = !this.state.isShuffleMode;
+      shuffleBtn.classList.toggle("active", this.state.isShuffleMode);
+    };
+    repeatBtn.onclick = () => {
+      this.state.isRepeatMode = !this.state.isRepeatMode;
+      repeatBtn.classList.toggle("active", this.state.isRepeatMode);
+    };
     volumeToggleBtn.onclick = this.#toggleMute;
     this.#handleKeyboardEvent(volumeToggleBtn, this.#toggleMute);
-    
-    audio.ontimeupdate = this.#updateProgress;
-    audio.onwaiting = () => { if (!this.state.isSeeking) { this.state.isLoading = true; this.#updatePlayPauseButton(); } };
-    audio.onplaying = audio.oncanplay = audio.onplay = () => { this.state.isLoading = false; this.state.isPlaying = true; this.#updatePlayPauseButton(); };
-    audio.onpause = () => { this.state.isPlaying = false; this.#updatePlayPauseButton(); };
-    audio.onended = () => this.state.isRepeatMode ? (audio.currentTime = 0, audio.play()) : this.#playNext();
 
-    this.#setupDrag(progressBar, 'isDragging', (e) => {
+    audio.ontimeupdate = this.#updateProgress;
+    audio.onwaiting = () => {
+      if (!this.state.isSeeking) {
+        this.state.isLoading = true;
+        this.#updatePlayPauseButton();
+      }
+    };
+    audio.onplaying =
+      audio.oncanplay =
+      audio.onplay =
+        () => {
+          this.state.isLoading = false;
+          this.state.isPlaying = true;
+          this.#updatePlayPauseButton();
+        };
+    audio.onpause = () => {
+      this.state.isPlaying = false;
+      this.#updatePlayPauseButton();
+    };
+    audio.onended = () =>
+      this.state.isRepeatMode
+        ? ((audio.currentTime = 0), audio.play())
+        : this.#playNext();
+
+    this.#setupDrag(progressBar, "isDragging", (e) => {
       if (!audio.duration) return;
       const rect = progressBar.getBoundingClientRect();
       const p = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
@@ -546,7 +714,7 @@ class MusicPlayer extends HTMLElement {
       this.#updateProgress();
     });
 
-    this.#setupDrag(volumeProgressBar, 'isVolumeDragging', (e) => {
+    this.#setupDrag(volumeProgressBar, "isVolumeDragging", (e) => {
       const rect = volumeProgressBar.getBoundingClientRect();
       const p = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       this.#setVolume(p);
@@ -563,50 +731,95 @@ class MusicPlayer extends HTMLElement {
   #renderMusicListDOM() {
     const container = this.elements.musicListContainer;
     if (!container) return;
-    const iconPath = this.#getIconPath('icon-music.svg');
-    const playIconPath = this.#getIconPath('icon-play.svg');
-    container.innerHTML = this.musicList.map(music => {
-      return getMusicItemHTML(music, iconPath, playIconPath, MusicPlayer.formatTime(music.lengthSeconds));
-    }).join("");
+    const iconPath = this.#getIconPath("icon-music.svg");
+    const playIconPath = this.#getIconPath("icon-play.svg");
+    container.innerHTML = this.musicList
+      .map((music) => {
+        return getMusicItemHTML(
+          music,
+          iconPath,
+          playIconPath,
+          MusicPlayer.formatTime(music.lengthSeconds),
+        );
+      })
+      .join("");
 
     container.onpointerdown = (e) => {
-      const item = e.target.closest('.music-item');
+      const item = e.target.closest(".music-item");
       if (item) {
         e.stopPropagation();
-        const id = item.getAttribute('data-id');
+        const id = item.getAttribute("data-id");
         this.#playMusic(id);
-  }
+      }
     };
   }
 
   #loadDataFromAttribute() {
-    const endpoint = this.#getEndpoint();
-    if (endpoint) {
-      fetch(endpoint)
-        .then(res => res.json())
-        .then(res => {
-      if (res.state) this.setMusicData(res.data);
-        })
-        .catch(error => {
-          console.error('[Music Player] 載入音樂資料失敗:', error);
-        });
-    }
+    const source = this.#getDataSource();
+    if (!source.url) return;
+
+    fetch(source.url)
+      .then((res) => res.json())
+      .then((payload) => {
+        const musicArray = this.#extractMusicData(payload, source.type);
+        if (Array.isArray(musicArray)) {
+          this.setMusicData(musicArray);
+          return;
+        }
+        console.warn(
+          `[Music Player] ${source.type} 載入成功，但資料格式不符，預期為音樂陣列。`,
+        );
+      })
+      .catch((error) => {
+        console.error("[Music Player] 載入音樂資料失敗:", error);
+      });
   }
 
-  #getEndpoint() {
-    // 優先順序：HTML 屬性 > 全域變數
-    const attrEndpoint = this.getAttribute('data-endpoint');
+  #getDataSource() {
+    // 優先順序：HTML 屬性（data-endpoint > data-url）> 全域變數（endpoint > data-url）
+    const attrEndpoint = this.getAttribute("data-endpoint");
+    if (attrEndpoint) return { type: "data-endpoint", url: attrEndpoint };
+
+    const attrDataUrl = this.getAttribute("data-url");
+    if (attrDataUrl) return { type: "data-url", url: attrDataUrl };
+
     const globalEndpoint = window.MUSIC_PLAYER_ENDPOINT;
-    
-    return attrEndpoint || globalEndpoint || '';
+    if (globalEndpoint) return { type: "data-endpoint", url: globalEndpoint };
+
+    const globalDataUrl = window.MUSIC_PLAYER_DATA_URL;
+    if (globalDataUrl) return { type: "data-url", url: globalDataUrl };
+
+    return { type: "", url: "" };
+  }
+
+  #extractMusicData(payload, sourceType) {
+    if (!payload) return null;
+    if (Array.isArray(payload)) return payload;
+
+    if (
+      typeof payload === "object" &&
+      "state" in payload &&
+      payload.state === false
+    ) {
+      return null;
+    }
+
+    if (Array.isArray(payload.data)) return payload.data;
+    if (Array.isArray(payload.list)) return payload.list;
+
+    // data-url 場景允許包裝格式，保留擴充彈性
+    if (sourceType === "data-url" && Array.isArray(payload.items))
+      return payload.items;
+
+    return null;
   }
 
   setMusicData(data) {
-    this.musicList = data.map(m => ({
-      ...m, 
-      image: this.#resolveResourcePath(m.image)
+    this.musicList = data.map((m) => ({
+      ...m,
+      image: this.#resolveResourcePath(m.image),
     }));
-    const savedHistory = sessionStorage.getItem('musicPlayHistory');
+    const savedHistory = sessionStorage.getItem("musicPlayHistory");
     if (savedHistory) {
       try {
         this.state.playHistory = JSON.parse(savedHistory);
@@ -616,17 +829,20 @@ class MusicPlayer extends HTMLElement {
       }
     } else {
       this.state.playHistory = [];
-      }
+    }
 
     this.#renderMusicListDOM();
     const def = this.#getDefaultMusic();
-    if (def) { 
-      this.#setMusicInfo(def.id); 
-      this.#showInteractionPrompt(); 
+    if (def) {
+      this.#setMusicInfo(def.id);
+      this.#showInteractionPrompt();
     }
   }
 
-  setCustomIcons(icons) { this.state.customIcons = { ...this.state.customIcons, ...icons }; this.#updateAllIcons(); }
+  setCustomIcons(icons) {
+    this.state.customIcons = { ...this.state.customIcons, ...icons };
+    this.#updateAllIcons();
+  }
 }
 
 customElements.define("music-player", MusicPlayer);
